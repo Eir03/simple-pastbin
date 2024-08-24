@@ -56,6 +56,9 @@ async def create_post(post: PostCreate, session: AsyncSession = Depends(get_asyn
 
 @router_post.get('/{hash_id}', response_model=PostRead)
 async def get_post(hash_id: str, session: AsyncSession = Depends(get_async_session)):
+    # Добавить удаление после прочтения
+    # Добавить приватность
+
     result = await session.execute(select(Post).where(Post.hash == hash_id))
     result = result.scalars().first()
     if result is None:
