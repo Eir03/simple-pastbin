@@ -9,10 +9,6 @@ from auth.shemas import UserCreate, UserRead
 from posts.posts import router_post
 from auth.auth import auth_backend
 
-
-
-
-
 app = FastAPI()
 
 app.include_router(router_post)

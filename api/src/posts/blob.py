@@ -16,7 +16,6 @@ def create_bucket_if_not_exists(bucket_name: str):
 
 def upload_text_to_minio(bucket_name: str, object_name: str, content: str):
     try:
-        # Создаем ведро, если оно не существует
         create_bucket_if_not_exists(bucket_name)
         
         # Преобразуем текст в байты
@@ -33,7 +32,7 @@ def upload_text_to_minio(bucket_name: str, object_name: str, content: str):
         )
         
         # Возвращаем URL загруженного объекта
-        return f"http://{URL_BLOB}/{bucket_name}/{object_name}"
+        return f"{URL_BLOB}/{bucket_name}/{object_name}"
     except Exception as ex:
         print(f"Ошибка при загрузке в MinIO: {ex}")
         return None

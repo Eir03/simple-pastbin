@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from config import URL_BLOB, URL_HASH_GEN
 from posts.blob import upload_text_to_minio
 from posts.database import Post, get_async_session
-from posts.models import PostCreate
+from posts.models import PostCreate, PostRead
 
 router_post = APIRouter(
     prefix='/posts',
@@ -24,7 +24,7 @@ async def get_hash_from_service():
 async def get_posts():
     return await ''
 
-@router_post.post('', response_model=PostCreate)
+@router_post.post('', response_model=PostRead)
 async def create_post(post: PostCreate, session: AsyncSession = Depends(get_async_session)):
     hash_value = await get_hash_from_service()
     print(hash_value)
@@ -47,11 +47,11 @@ async def create_post(post: PostCreate, session: AsyncSession = Depends(get_asyn
         tags=post.tags,
         expires_at=post.expires_at
     )
-
+    print(new_post)
     session.add(new_post)
     await session.commit()
     await session.refresh(new_post)
-    return await new_post
+    return PostRead.model_validate(new_post)
 
 @router_post.get('/{hash_id}')
 async def get_post(hash_id: str):
