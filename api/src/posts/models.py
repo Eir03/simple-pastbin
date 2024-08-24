@@ -19,6 +19,7 @@ class PostRead(BaseModel):
     id: int
     title: Optional[str]
     blob_storage_url: str
+    hash: str
     created_at: datetime
     expires_at: Optional[datetime]
     is_public: bool
