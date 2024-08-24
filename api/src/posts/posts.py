@@ -22,7 +22,7 @@ async def get_hash_from_service():
 
 @router_post.get('')
 async def get_posts():
-    return await ''
+    return ''
 
 @router_post.post('', response_model=PostRead)
 async def create_post(post: PostCreate, session: AsyncSession = Depends(get_async_session)):
@@ -55,18 +55,18 @@ async def create_post(post: PostCreate, session: AsyncSession = Depends(get_asyn
 
 @router_post.get('/{hash_id}')
 async def get_post(hash_id: str):
-    return await None
+    return None
 
 @router_post.put('/{hash_id}')
 async def update_post(hash_id: str):
-    return await None
+    return None
 
 # Нужно добавить что удалить может только сам пользователь
 @router_post.delete('/{hash_id}')
 async def delete_post(hash_id: str):
-    return await None
+    return None
 
 # Посты должны иметь публичный доступ
 @router_post.get('/get_by_user/{user_id}')
 async def get_by_user(user_id: str):
-    return await None
+    return None
