@@ -18,7 +18,7 @@ def generate_hash():
 # Функция для наполнения кэша хешами
 def populate_cache():
     while True:
-        print(f"Количество хешей =",r.llen(HASH_CACHE_KEY))
+        # print(f"Количество хешей =",r.llen(HASH_CACHE_KEY))
         if r.llen(HASH_CACHE_KEY) < 1000:  # Если в кэше меньше 1000 хешей
             for _ in range(1000):
                 r.lpush(HASH_CACHE_KEY, generate_hash())  # Добавляем новые хеши в кэш

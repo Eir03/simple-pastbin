@@ -91,10 +91,11 @@ const Body = () => {
     useEffect(() => {
       // Заглушка для имитации запроса к API
       const fetchFieldConfig = () => {
+        setFieldConfig(temporaryFieldConfig);
         // Задержка для имитации сетевого запроса
-        setTimeout(() => {
-          setFieldConfig(temporaryFieldConfig);
-        }, 500); // 0.5 секунд задержки
+        // setTimeout(() => {
+        //   setFieldConfig(temporaryFieldConfig);
+        // }, 500);
       };
   
       fetchFieldConfig();

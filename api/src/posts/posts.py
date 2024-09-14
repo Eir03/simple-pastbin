@@ -30,7 +30,7 @@ async def create_post(post: PostCreate, session: AsyncSession = Depends(get_asyn
     hash_value = await get_hash_from_service()
     print(hash_value)
 
-    blob_storage_url = upload_text_to_minio("posts", f'{hash_value}.txt', post.content)
+    blob_storage_url = upload_text_to_minio("posts", f'{hash_value}', post.content)
 
     if blob_storage_url is None:
         raise HTTPException(status_code=500, detail="Failed to upload content to MinIO")
