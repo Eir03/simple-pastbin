@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import './Body.css'
+import TagInput from './TagInput'
 const temporaryFieldConfig = [
   {
     label: 'Категория',
@@ -8,7 +9,7 @@ const temporaryFieldConfig = [
   },
   {
     label: 'Метки',
-    type: 'text',
+    type: 'tags',
   },
   {
     label: 'Время жизни',
@@ -53,11 +54,18 @@ const FormField = ({ field }) => {
           <input type="text" />
         </div>
       );
+    case 'tags':
+      return (
+        <div className="form-group">
+          <label>{field.label}:</label>
+          <TagInput tags={[]}/>
+        </div>
+      );
     case 'checkbox':
       return (
         <div className="form-group">
-          <label>
-            <input type="checkbox" />
+          <label className='noselect'>
+            <input type="checkbox"/>
             {field.label}
             {field.isNew && <span className="new-badge">NEW</span>}
           </label>
