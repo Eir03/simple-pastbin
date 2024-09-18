@@ -4,7 +4,7 @@ from config import BLOB_ACCESS_KEY, BLOB_SECRET_KEY, BLOB_SECURE, URL_BLOB
 
 # Инициализация клиента MinIO
 minio_client = Minio(
-    "192.168.195.107:9000",
+    URL_BLOB,
     access_key=BLOB_ACCESS_KEY,
     secret_key=BLOB_SECRET_KEY,
     secure=False
