@@ -1,38 +1,41 @@
 from io import BytesIO
 from minio import Minio
-from config import BLOB_ACCESS_KEY, BLOB_SECRET_KEY, BLOB_SECURE, URL_BLOB
+from config import BLOB_ACCESS_KEY, BLOB_SECRET_KEY, BLOB_SECURE, URL_BLOB, BUCKET
+from botocore.exceptions import NoCredentialsError, ClientError
+import boto3
 
-# Инициализация клиента MinIO
-minio_client = Minio(
-    URL_BLOB,
-    access_key=BLOB_ACCESS_KEY,
-    secret_key=BLOB_SECRET_KEY,
-    secure=False
+session = boto3.session.Session()
+s3 = boto3.client(
+    's3',
+    endpoint_url=URL_BLOB,
+    aws_access_key_id=BLOB_ACCESS_KEY,
+    aws_secret_access_key=BLOB_SECRET_KEY
 )
 
 def create_bucket_if_not_exists(bucket_name: str):
-    if not minio_client.bucket_exists(bucket_name):
-        minio_client.make_bucket(bucket_name)
+    try:
+        response = s3.list_buckets()
+        if not any(bucket['Name'] == bucket_name for bucket in response['Buckets']):
+            s3.create_bucket(Bucket=bucket_name)
+            print(f"Бакет {bucket_name} создан.")
+    except ClientError as e:
+        print(f"Ошибка при создании бакета: {e}")
 
-def upload_text_to_minio(bucket_name: str, object_name: str, content: str):
+def upload_text_to_s3(bucket_name: str, object_name: str, content: str):
     try:
         create_bucket_if_not_exists(bucket_name)
         
-        # Преобразуем текст в байты
         content_bytes = content.encode('utf-8')
-        content_stream = BytesIO(content_bytes)
         
-        # Загрузка текста в MinIO
-        minio_client.put_object(
-            bucket_name=bucket_name,
-            object_name=object_name,
-            data=content_stream,
-            length=len(content_bytes),
-            content_type='text/plain'
+        s3.put_object(
+            Bucket=bucket_name,
+            Key=object_name,
+            Body=content_bytes,
+            ContentType='text/plain'
         )
         
-        # Возвращаем URL загруженного объекта
         return f"{URL_BLOB}/{bucket_name}/{object_name}"
-    except Exception as ex:
-        print(f"Ошибка при загрузке в MinIO: {ex}")
+    
+    except (NoCredentialsError, ClientError) as e:
+        print(f"Ошибка при загрузке в S3: {e}")
         return None

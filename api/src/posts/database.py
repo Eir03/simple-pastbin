@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from typing import AsyncGenerator
 from sqlalchemy.orm import relationship
-
+from sqlalchemy.future import select
 
 
 DATABASE_URL = f"postgresql+asyncpg://{POST_DB_USER}:{POST_DB_PASS}@{POST_DB_HOST}:{POST_DB_PORT}/{POST_DB_NAME}"
@@ -39,6 +39,16 @@ async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 async def create_db_posts():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+            
+    async with async_session_maker() as session:
+        result = await session.execute(select(Category).where(Category.name == 'Default'))
+        default_category = result.scalars().first()
+
+        if not default_category:
+            # Добавление новой категории, если её нет
+            new_category = Category(name="Default")
+            session.add(new_category)
+        await session.commit()
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:

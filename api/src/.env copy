@@ -19,3 +19,4 @@ URL_BLOB="http://localhost:9000"
 BLOB_ACCESS_KEY='minioadmin'
 BLOB_SECRET_KEY='minioadmin'
 BLOB_SECURE='true'
+BUCKET='bucket'

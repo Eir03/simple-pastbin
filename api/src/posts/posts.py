@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException
 import httpx
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from config import URL_BLOB, URL_HASH_GEN
-from posts.blob import upload_text_to_minio
+from config import URL_BLOB, URL_HASH_GEN, BUCKET
+from posts.blob import upload_text_to_s3
 from posts.database import Post, get_async_session
 from posts.models import PostCreate, PostRead
 
@@ -12,7 +12,6 @@ router_post = APIRouter(
     prefix='/posts',
     tags=['posts']
 )
-
 
 async def get_hash_from_service():
     async with httpx.AsyncClient() as client:
@@ -28,12 +27,11 @@ async def get_posts():
 @router_post.post('', response_model=PostRead)
 async def create_post(post: PostCreate, session: AsyncSession = Depends(get_async_session)):
     hash_value = await get_hash_from_service()
-    print(hash_value)
 
-    blob_storage_url = upload_text_to_minio("posts", f'{hash_value}', post.content)
+    blob_storage_url = upload_text_to_s3(BUCKET, f'{hash_value}', post.content)
 
     if blob_storage_url is None:
-        raise HTTPException(status_code=500, detail="Failed to upload content to MinIO")
+        raise HTTPException(status_code=500, detail="Failed to upload content to S3")
     
     now = datetime.now(timezone.utc)
 
@@ -48,7 +46,6 @@ async def create_post(post: PostCreate, session: AsyncSession = Depends(get_asyn
         tags=post.tags,
         expires_at=post.expires_at
     )
-    print(new_post)
     session.add(new_post)
     await session.commit()
     await session.refresh(new_post)
