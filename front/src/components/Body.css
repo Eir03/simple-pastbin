@@ -59,6 +59,7 @@ textarea:focus {
 
 .form-group label{
   align-self: flex-start;
+  margin-top: 8px;
 }
 
 .form-group select,

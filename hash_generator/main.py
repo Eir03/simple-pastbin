@@ -11,17 +11,15 @@ r = redis.Redis(host='localhost', port=6379, db=0)
 
 HASH_CACHE_KEY = "hash_cache"  # Ключ для хранения хешей в кэше
 
-# Функция генерации хеша
 def generate_hash():
     return str(uuid.uuid4())[10:].replace('-','')
 
 # Функция для наполнения кэша хешами
 def populate_cache():
     while True:
-        # print(f"Количество хешей =",r.llen(HASH_CACHE_KEY))
-        if r.llen(HASH_CACHE_KEY) < 1000:  # Если в кэше меньше 1000 хешей
+        if r.llen(HASH_CACHE_KEY) < 1000:
             for _ in range(1000):
-                r.lpush(HASH_CACHE_KEY, generate_hash())  # Добавляем новые хеши в кэш
+                r.lpush(HASH_CACHE_KEY, generate_hash()) 
         time.sleep(10)  # Спим 10 секунд перед следующей проверкой
 
 # Запуск фоновой задачи для наполнения кэша, потом будет через celery

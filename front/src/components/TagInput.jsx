@@ -1,20 +1,25 @@
 import React from 'react'
 import './TagInput.css'
 
-const TagInput = ({tags}) => {
+const TagInput = ({tags, onChange}) => {
     const [tagData, setTagData] = React.useState(tags);
-    const removeTagData = indexToRemove => {
-      setTagData([...tagData.filter((_, index) => index !== indexToRemove)]);
+
+    const removeTagData = (indexToRemove) => {
+      const newTags = [...tagData.filter((_, index) => index !== indexToRemove)];
+      setTagData(newTags);
+      onChange(newTags);
     };
-    const addTagData = event => {
-        const newTag = event.target.value.trim();
-        if (newTag !== '' && !tagData.includes(newTag) && tagData.length < 15) {
-          setTagData([...tagData, newTag]);
-          event.target.value = '';
-        } 
-        else if (tagData.includes(newTag)) { return} 
-        else if (tagData.length >= 15) { return}
+
+    const addTagData = (event) => {
+      const newTag = event.target.value.trim();
+      if (newTag !== '' && !tagData.includes(newTag) && tagData.length < 15) {
+        const newTags = [...tagData, newTag];
+        setTagData(newTags);
+        onChange(newTags);
+        event.target.value = '';
+      }
     };
+
     return (
       <div className="tag-input">
         <input
