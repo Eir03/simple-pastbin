@@ -16,7 +16,7 @@ r = redis.Redis(os.environ.get("HOST_REDIS"),
                 db=os.environ.get("DB_REDIS"))
 
 HASH_CACHE_KEY = os.environ.get("HASH_CACHE_KEY")  # Ключ для хранения хешей в кэше
-MAX_COUNT = os.environ.get("MAX_COUNT")
+MAX_COUNT = int(os.environ.get("MAX_COUNT"))
 
 def generate_hash():
     return str(uuid.uuid4())[10:].replace('-','')
