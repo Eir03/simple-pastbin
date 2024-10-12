@@ -1,4 +1,5 @@
 from datetime import datetime
+from sqlite3 import ProgrammingError
 from sqlalchemy import ARRAY, TIMESTAMP, Boolean, Column, ForeignKey, Integer, String, Text
 from config import POST_DB_HOST, POST_DB_NAME, POST_DB_PASS, POST_DB_PORT, POST_DB_USER
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -7,6 +8,8 @@ from typing import AsyncGenerator
 from sqlalchemy.orm import relationship
 from sqlalchemy.future import select
 
+ADMIN_DATABASE_URL = f"postgresql+asyncpg://{POST_DB_USER}:{POST_DB_PASS}@{POST_DB_HOST}:{POST_DB_PORT}/postgres"
+admin_engine = create_async_engine(ADMIN_DATABASE_URL)
 
 DATABASE_URL = f"postgresql+asyncpg://{POST_DB_USER}:{POST_DB_PASS}@{POST_DB_HOST}:{POST_DB_PORT}/{POST_DB_NAME}"
 Base: DeclarativeMeta = declarative_base()
@@ -35,8 +38,19 @@ class Post(Base):
 engine = create_async_engine(DATABASE_URL)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
+async def create_database_if_not_exists():
+    async with admin_engine.connect() as conn:
+        try:
+            await conn.execute(f"CREATE DATABASE {POST_DB_NAME}")
+            print(f"База данных {POST_DB_NAME} создана.")
+        except ProgrammingError as e:
+            if "already exists" in str(e):
+                print(f"База данных {POST_DB_NAME} уже существует.")
+            else:
+                raise
 
 async def create_db_posts():
+    await create_database_if_not_exists()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
             
