@@ -4,6 +4,7 @@
   margin: 0 10vh;
   display: grid;
   grid-template-columns: 3fr 1fr;
+  border-radius: 5px;
 }
 .sidebar {
   border-left: 1px dotted grey;
@@ -106,4 +107,9 @@ textarea:focus {
 
 .create-button:hover {
   background-color: #0056b3;
+}
+
+.settings_title h3{
+margin-top: 0;
+
 }

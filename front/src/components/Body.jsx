@@ -86,7 +86,7 @@ const Body = () => {
       }}}>
       <div className="main">
           <div className="content">
-              <h3 className="newpost">Новый пост</h3>
+              <h3 className="newpost">Новая заметка</h3>
               <TextArea formData={formData} handleInputChange={handleInputChange}/>
               <div className="settings">
                   <div className="settings_title">
@@ -104,14 +104,14 @@ const Body = () => {
           </div>
           <div className="sidebar">
               <div className="sidebar_title">
-                  <h3>Популярные посты</h3>
+                  <h3>Популярные заметки</h3>
               </div>
               <div className="sidebar_menu">
-                  <p><a href="">Популярный пост</a></p>
-                  <p><a href="">Популярный пост</a></p>
-                  <p><a href="">Популярный пост</a></p>
-                  <p><a href="">Популярный пост</a></p>
-                  <p><a href="">Популярный пост</a></p>
+                  <p><a href="">Популярная заметка</a></p>
+                  <p><a href="">Популярная заметка</a></p>
+                  <p><a href="">Популярная заметка</a></p>
+                  <p><a href="">Популярная заметка</a></p>
+                  <p><a href="">Популярная заметка</a></p>
               </div>
           </div> 
       </div>
