@@ -49,3 +49,5 @@ services:
 # volumes для сохранения данных
 volumes:
   postgres_data:
+
+
