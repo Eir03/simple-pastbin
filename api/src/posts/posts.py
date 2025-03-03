@@ -5,7 +5,7 @@ import httpx
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from config import URL_BLOB, BUCKET, USE_BLOB
-from posts.blob import upload_text_to_s3
+from posts.blob import upload_text_to_s3, delete_object_from_s3
 from posts.database import Post, get_async_session
 from posts.models import PostCreate, PostRead
 
@@ -14,15 +14,9 @@ router_post = APIRouter(
     tags=['posts']
 )
 
-# async def get_hash_from_service():
-#     async with httpx.AsyncClient() as client:
-#         response = await client.get(URL_HASH_GEN + "/get-hash")
-#         if response.status_code != 200:
-#             raise HTTPException(status_code=500, detail="Failed to generate hash")
-#         return response.json().get("hash")
-
 @router_post.get('')
 async def get_posts():
+    # Добавить приватность
     return ''
 
 @router_post.post('', response_model=PostRead)
@@ -39,15 +33,13 @@ async def create_post(post: PostCreate, session: AsyncSession = Depends(get_asyn
         blob_storage_url = 'None'
         content_post = post.content
     
-    now = datetime.now(timezone.utc)
-
     new_post = Post(
         title=post.title,
         hash=hash_value,
         blob_storage_url=blob_storage_url,
         category_id=post.category_id,
         is_public=post.is_public,
-        created_at=now,
+        created_at=datetime.now(timezone.utc),
         delete_after_reading=post.delete_after_reading,
         tags=post.tags,
         expires_at=post.expires_at,
@@ -61,13 +53,20 @@ async def create_post(post: PostCreate, session: AsyncSession = Depends(get_asyn
 @router_post.get('/{hash_id}', response_model=PostRead)
 async def get_post(hash_id: str, session: AsyncSession = Depends(get_async_session)):
     # Добавить удаление после прочтения
-    # Добавить приватность
+    
 
     result = await session.execute(select(Post).where(Post.hash == hash_id))
     result = result.scalars().first()
     if result is None:
         raise HTTPException(status_code=404, detail="Not Found")
     
+    if result.delete_after_reading:
+        await session.delete(result)
+        await session.commit()
+        
+        if USE_BLOB:
+            delete_object_from_s3(BUCKET, result.hash)
+            
     return PostRead.model_validate(result)
     
 

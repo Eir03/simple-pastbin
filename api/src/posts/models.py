@@ -15,7 +15,7 @@ class PostCreate(BaseModel):
 
     class Config:
         from_attributes = True
-        
+
 class PostRead(BaseModel):
     id: int
     title: Optional[str]
@@ -26,6 +26,7 @@ class PostRead(BaseModel):
     is_public: bool
     delete_after_reading: bool
     tags: Optional[List[str]]
+    content: Optional[str]
 
     class Config:
         from_attributes = True

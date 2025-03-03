@@ -1,6 +1,6 @@
 from io import BytesIO
 from minio import Minio
-from config import BLOB_ACCESS_KEY, BLOB_SECRET_KEY, BLOB_SECURE, URL_BLOB, BUCKET
+from config import BLOB_ACCESS_KEY, BLOB_SECRET_KEY, URL_BLOB, USE_BLOB
 from botocore.exceptions import NoCredentialsError, ClientError
 import boto3
 
@@ -39,3 +39,11 @@ def upload_text_to_s3(bucket_name: str, object_name: str, content: str):
     except (NoCredentialsError, ClientError) as e:
         print(f"Ошибка при загрузке в S3: {e}")
         return None
+    
+def delete_object_from_s3(bucket_name: str, object_name: str):
+    try:
+        s3.delete_object(Bucket=bucket_name, Key=object_name)
+        return True
+    except (NoCredentialsError, ClientError) as e:
+        print(f"Ошибка при удалении из S3: {e}")
+        return False

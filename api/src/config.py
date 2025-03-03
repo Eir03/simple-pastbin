@@ -18,9 +18,9 @@ POST_DB_NAME = os.environ.get("POST_DB_NAME")
 POST_DB_USER = os.environ.get("POST_DB_USER")
 POST_DB_PASS = os.environ.get("POST_DB_PASS")
 
-USE_BLOB= os.getenv('USE_BLOB')
+USE_BLOB = os.getenv('USE_BLOB', 'false').lower() == 'true'
 URL_BLOB = os.environ.get("URL_BLOB")
 BLOB_ACCESS_KEY = os.getenv('BLOB_ACCESS_KEY')
 BLOB_SECRET_KEY = os.getenv('BLOB_SECRET_KEY')
-BLOB_SECURE = os.getenv('BLOB_SECURE')
+BLOB_SECURE = os.getenv('BLOB_SECURE', 'false').lower() == 'true'
 BUCKET = os.getenv('BUCKET')
