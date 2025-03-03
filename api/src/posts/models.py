@@ -15,6 +15,7 @@ class PostCreate(BaseModel):
 
     class Config:
         from_attributes = True
+        
 class PostRead(BaseModel):
     id: int
     title: Optional[str]
