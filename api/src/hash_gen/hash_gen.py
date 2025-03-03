@@ -3,12 +3,9 @@ import redis
 import uuid
 from threading import Thread
 import time
-from dotenv import load_dotenv
 import os
 
-load_dotenv()
 AUTH_DB_HOST = os.environ.get("AUTH_DB_HOST")
-app = FastAPI(description="hash generator")
 
 # Подключение к Redis
 r = redis.Redis(os.environ.get("HOST_REDIS"), 
@@ -34,8 +31,7 @@ Thread(target=populate_cache, daemon=True).start()
 
 
 # Endpoint для получения хеша
-@app.get("/get-hash")
 async def get_hash():
     if r.llen(HASH_CACHE_KEY) == 0:  # Если кэш пуст
-        return {"hash": generate_hash()}
-    return {"hash": r.rpop(HASH_CACHE_KEY).decode("utf-8")}  # Возвращаем хеш из кэша
+        return generate_hash()
+    return r.rpop(HASH_CACHE_KEY).decode("utf-8")  # Возвращаем хеш из кэша

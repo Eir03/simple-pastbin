@@ -18,8 +18,7 @@ POST_DB_NAME = os.environ.get("POST_DB_NAME")
 POST_DB_USER = os.environ.get("POST_DB_USER")
 POST_DB_PASS = os.environ.get("POST_DB_PASS")
 
-URL_HASH_GEN = os.environ.get("URL_HASH_GEN")
-
+USE_BLOB= os.getenv('USE_BLOB')
 URL_BLOB = os.environ.get("URL_BLOB")
 BLOB_ACCESS_KEY = os.getenv('BLOB_ACCESS_KEY')
 BLOB_SECRET_KEY = os.getenv('BLOB_SECRET_KEY')

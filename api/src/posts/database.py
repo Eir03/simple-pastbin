@@ -33,6 +33,7 @@ class Post(Base):
     delete_after_reading = Column(Boolean, default=False)
     tags = Column(ARRAY(String), nullable=True)
     category = relationship("Category")
+    content = Column(String, nullable=True)
 
 
 engine = create_async_engine(DATABASE_URL)

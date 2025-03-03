@@ -8,6 +8,7 @@ services:
       - ./api/src/.env
     depends_on:
       - postgres
+      - redis
 
   postgres:
     image: postgres:13-alpine
@@ -19,22 +20,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data  # Том для хранения данных
-
-  hash-generator:
-    build: ./hash_generator  
-    ports:
-      - "8001:8001"
-    env_file: 
-      - ./hash_generator/.env
-    # environment:
-    #   REDIS_HOST: ${HOST_REDIS}
-    #   REDIS_PORT: ${PORT_REDIS}
-    #   MAX_COUNT:  ${MAX_COUNT}
-    #   HASH_CACHE_KEY: ${HASH_CACHE_KEY}
-    #   REDIS_DB: ${DB_REDIS}
-    depends_on:
-      - redis
+      - postgres_data:/var/lib/postgresql/data  # Том для хранения данных     
 
   redis:
     image: "redis:alpine"

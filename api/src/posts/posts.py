@@ -1,9 +1,10 @@
 from datetime import datetime, timezone
+from hash_gen.hash_gen import get_hash
 from fastapi import APIRouter, Depends, HTTPException
 import httpx
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from config import URL_BLOB, URL_HASH_GEN, BUCKET
+from config import URL_BLOB, BUCKET, USE_BLOB
 from posts.blob import upload_text_to_s3
 from posts.database import Post, get_async_session
 from posts.models import PostCreate, PostRead
@@ -13,12 +14,12 @@ router_post = APIRouter(
     tags=['posts']
 )
 
-async def get_hash_from_service():
-    async with httpx.AsyncClient() as client:
-        response = await client.get(URL_HASH_GEN + "/get-hash")
-        if response.status_code != 200:
-            raise HTTPException(status_code=500, detail="Failed to generate hash")
-        return response.json().get("hash")
+# async def get_hash_from_service():
+#     async with httpx.AsyncClient() as client:
+#         response = await client.get(URL_HASH_GEN + "/get-hash")
+#         if response.status_code != 200:
+#             raise HTTPException(status_code=500, detail="Failed to generate hash")
+#         return response.json().get("hash")
 
 @router_post.get('')
 async def get_posts():
@@ -26,12 +27,17 @@ async def get_posts():
 
 @router_post.post('', response_model=PostRead)
 async def create_post(post: PostCreate, session: AsyncSession = Depends(get_async_session)):
-    hash_value = await get_hash_from_service()
+    hash_value = await get_hash()
 
-    blob_storage_url = upload_text_to_s3(BUCKET, f'{hash_value}', post.content)
+    if USE_BLOB:
+        content_post = None
+        blob_storage_url = upload_text_to_s3(BUCKET, f'{hash_value}', post.content)
 
-    if blob_storage_url is None:
-        raise HTTPException(status_code=500, detail="Failed to upload content to S3")
+        if blob_storage_url is None:
+            raise HTTPException(status_code=500, detail="Failed to upload content to S3")
+    else:
+        blob_storage_url = 'None'
+        content_post = post.content
     
     now = datetime.now(timezone.utc)
 
@@ -44,7 +50,8 @@ async def create_post(post: PostCreate, session: AsyncSession = Depends(get_asyn
         created_at=now,
         delete_after_reading=post.delete_after_reading,
         tags=post.tags,
-        expires_at=post.expires_at
+        expires_at=post.expires_at,
+        content=content_post
     )
     session.add(new_post)
     await session.commit()
