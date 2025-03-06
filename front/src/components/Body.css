@@ -6,17 +6,7 @@
   grid-template-columns: 3fr 1fr;
   border-radius: 5px;
 }
-.sidebar {
-  border-left: 1px dotted grey;
-  padding-left: 10px;
-  margin-left: 20px;
-}
-.sidebar_title {
-  border-bottom: 1px dotted grey;
-}
-.sidebar_menu p {
-  padding-bottom: 10px;
-}
+
 .content textarea {
   overflow: hidden;
   overflow-wrap: break-word;

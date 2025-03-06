@@ -3,6 +3,7 @@ import './Body.css'
 import TagInput from './TagInput'
 import {createPost} from '../Api';
 import TextArea from './TextArea';
+import Sidebar from './Sidebar';
 
 const Body = () => {  
 
@@ -102,18 +103,7 @@ const Body = () => {
                   </div>
               </div>
           </div>
-          <div className="sidebar">
-              <div className="sidebar_title">
-                  <h3>Популярные заметки</h3>
-              </div>
-              <div className="sidebar_menu">
-                  <p><a href="">Популярная заметка</a></p>
-                  <p><a href="">Популярная заметка</a></p>
-                  <p><a href="">Популярная заметка</a></p>
-                  <p><a href="">Популярная заметка</a></p>
-                  <p><a href="">Популярная заметка</a></p>
-              </div>
-          </div> 
+          <Sidebar/>
       </div>
     </form>
   )
