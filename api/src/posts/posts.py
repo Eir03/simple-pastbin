@@ -5,7 +5,7 @@ from typing import List
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from config import BUCKET, USE_BLOB
-from posts.blob import upload_text_to_s3, delete_object_from_s3
+from posts.blob import Blob
 from posts.database import Post, get_async_session
 from posts.models import PostCreate, PostRead
 
@@ -13,6 +13,8 @@ router_post = APIRouter(
     prefix='/posts',
     tags=['posts']
 )
+
+blob = Blob()
 
 @router_post.get('', response_model=List[PostRead])
 async def get_posts(session: AsyncSession = Depends(get_async_session), skip: int = 0, limit: int = 10):
@@ -32,8 +34,7 @@ async def get_post(hash_id: str, session: AsyncSession = Depends(get_async_sessi
         await session.delete(result)
         await session.commit()
         
-        if USE_BLOB:
-            delete_object_from_s3(BUCKET, result.hash)
+        blob.delete_object_from_s3(BUCKET, result.hash)
 
     return PostRead.model_validate(result)
     
@@ -41,20 +42,17 @@ async def get_post(hash_id: str, session: AsyncSession = Depends(get_async_sessi
 async def create_post(post: PostCreate, session: AsyncSession = Depends(get_async_session)):
     hash_value = await get_hash()
 
-    if USE_BLOB:
-        content_post = None
-        blob_storage_url = upload_text_to_s3(BUCKET, f'{hash_value}', post.content)
+    blob_storage_url = blob.upload_text(BUCKET, f'{hash_value}', post.content)
 
-        if blob_storage_url is None:
-            raise HTTPException(status_code=500, detail="Failed to upload content to S3")
-    else:
-        blob_storage_url = 'None'
-        content_post = post.content
+    content_post = None if blob_storage_url else post.content
+
+    if USE_BLOB and blob_storage_url is None:
+        raise HTTPException(status_code=500, detail="Failed to upload content to S3")
     
     new_post = Post(
         title=post.title,
         hash=hash_value,
-        blob_storage_url=blob_storage_url,
+        blob_storage_url=blob_storage_url if blob_storage_url else "None",
         category_id=post.category_id,
         is_public=post.is_public,
         created_at=datetime.now(timezone.utc),
