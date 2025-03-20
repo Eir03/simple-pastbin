@@ -57,15 +57,26 @@ async def create_db_posts():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
             
-    async with async_session_maker() as session:
-        result = await session.execute(select(Category).where(Category.name == 'Default'))
-        default_category = result.scalars().first()
+    categories = [
+        "Отсутствует", "Автомобили", "Бизнес", "Дом и сад", "Еда и напитки",
+        "Животные", "Игры", "Искусство", "История", "Книги", "Личное развитие",
+        "Мода", "Музыка", "Наука", "Образование", "Психология", "Путешествия",
+        "Развлечения", "Спорт", "Технологии", "Фильмы", "Финансы", "Фотография",
+        "Политика", "Здоровье"
+    ]
 
-        if not default_category:
-            # Добавление новой категории, если её нет
-            new_category = Category(name="Default")
-            session.add(new_category)
-        await session.commit()
+    async with async_session_maker() as session:
+        existing_categories = await session.execute(text("SELECT name FROM categories"))
+        existing_categories = {row[0] for row in existing_categories.fetchall()}
+
+        new_categories = [Category(name=name) for name in categories if name not in existing_categories]
+
+        if new_categories:
+            session.add_all(new_categories)
+            await session.commit()
+            print("Категории добавлены в базу данных.")
+        else:
+            print("Все категории уже существуют.")
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
