@@ -3,6 +3,7 @@ import PastPage from './components/PastPage'
 import Header from './components/Header';
 import Body from './components/Body';
 import './index.css'
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         {/* Настройка маршрута с параметром :id */}
         <Route path="/:id" element={<PastPage />} />
       </Routes>
+      <Footer/>
     </Router>
   );
 }
