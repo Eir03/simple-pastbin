@@ -21,7 +21,7 @@ const TagInput = ({tags, onChange}) => {
     };
 
     return (
-      <div className="tag-input">
+    <div className="tag-input">
       <input
         type="text"
         onKeyUp={(event) => (event.key === 'Enter' ? addTagData(event) : null)}

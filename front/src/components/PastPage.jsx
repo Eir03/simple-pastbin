@@ -1,6 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react';
+import TextArea from './TextArea';
 
 const PastPage = () => {
+  const [formData, setFormData] = useState({ content: 'Ваш текст здесь...' });
+
+  const handleInputChange = (e) => {
+    setFormData({ content: e.target.value });
+  };
+
   return (
     <div className='main h-96 border-solid border-[1px] border-[#ebebeb]'>
       <div className="m-5 ">
@@ -27,9 +34,10 @@ const PastPage = () => {
             <p>Time delete</p>
           </div>
         </div>
+      <TextArea formData={formData} handleInputChange={handleInputChange} readOnly={true} />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PastPage
+export default PastPage;
