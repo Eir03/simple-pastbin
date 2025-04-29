@@ -8,6 +8,8 @@ RUN npm install
 
 COPY . /app
 
+COPY .env.copy .env
+
 RUN npm run build
 
 FROM nginx:1.23-alpine
