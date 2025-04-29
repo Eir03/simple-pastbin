@@ -18,7 +18,7 @@ blob = Blob()
 
 @router_post.get('', response_model=List[PostPublicRead])
 async def get_posts(session: AsyncSession = Depends(get_async_session), skip: int = 0, limit: int = 10):
-    query = select(Post).where(Post.is_public == True, Post.delete_after_reading == False).offset(skip).limit(limit)
+    query = select(Post).where(Post.is_public == True).offset(skip).limit(limit)
     result = await session.execute(query)
     posts = result.scalars().all()
     return [PostPublicRead.model_validate(post) for post in posts]
