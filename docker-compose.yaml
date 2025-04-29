@@ -4,16 +4,16 @@ services:
     build: ./api
     ports:
       - "8000:8000"
-    env_file: 
-      - ./api/src/.env
+    # env_file: 
+    #   - ./api/src/.env
     depends_on:
       - postgres
       - redis
 
   postgres:
     image: postgres:13-alpine
-    env_file:
-      - ./api/src/.env
+    # env_file:
+    #   - ./api/src/.env
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
@@ -29,8 +29,8 @@ services:
 
   frontend:
     build: ./front
-    env_file:
-      - ./front/.env
+    # env_file:
+    #   - ./front/.env
     ports:
       - "3000:80"
 
