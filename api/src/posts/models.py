@@ -16,6 +16,8 @@ class PostCreate(BaseModel):
     class Config:
         from_attributes = True
 
+
+# TODO сделать наследование, сюда написать общие поля, а там только уникальные
 class PostRead(BaseModel):
     id: int
     title: Optional[str]
@@ -27,6 +29,31 @@ class PostRead(BaseModel):
     delete_after_reading: bool
     tags: Optional[List[str]]
     content: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+class PostPublicRead(BaseModel):
+    id: int
+    hash: str
+    title: Optional[str]
+    created_at: datetime
+    expires_at: Optional[datetime]
+    tags: Optional[List[str]]
+    is_public: bool
+
+    class Config:
+        from_attributes = True
+
+class PostDetailRead(BaseModel):
+    id: int
+    hash: str
+    title: Optional[str]
+    content: str
+    created_at: datetime
+    expires_at: Optional[datetime]
+    delete_after_reading: bool
+    tags: Optional[List[str]]
 
     class Config:
         from_attributes = True

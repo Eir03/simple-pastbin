@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from config import BUCKET, USE_BLOB
 from posts.blob import Blob
 from posts.database import Post, get_async_session
-from posts.models import PostCreate, PostRead
+from posts.models import PostCreate, PostRead, PostPublicRead, PostDetailRead
 
 router_post = APIRouter(
     prefix='/posts',
@@ -16,12 +16,12 @@ router_post = APIRouter(
 
 blob = Blob()
 
-@router_post.get('', response_model=List[PostRead])
+@router_post.get('', response_model=List[PostPublicRead])
 async def get_posts(session: AsyncSession = Depends(get_async_session), skip: int = 0, limit: int = 10):
-    query = select(Post).where(Post.is_public == True).offset(skip).limit(limit)
+    query = select(Post).where(Post.is_public == True, Post.delete_after_reading == False).offset(skip).limit(limit)
     result = await session.execute(query)
     posts = result.scalars().all()
-    return [PostRead.model_validate(post) for post in posts]
+    return [PostPublicRead.model_validate(post) for post in posts]
 
 @router_post.get('/{hash_id}', response_model=PostRead)
 async def get_post(hash_id: str, session: AsyncSession = Depends(get_async_session)):
@@ -36,7 +36,7 @@ async def get_post(hash_id: str, session: AsyncSession = Depends(get_async_sessi
         
         blob.delete_object_from_s3(BUCKET, result.hash)
 
-    return PostRead.model_validate(result)
+    return PostDetailRead.model_validate(result)
     
 @router_post.post('', response_model=PostRead)
 async def create_post(post: PostCreate, session: AsyncSession = Depends(get_async_session)):
@@ -77,5 +77,10 @@ async def delete_post(hash_id: str):
 
 # Посты должны иметь публичный доступ
 @router_post.get('/get_by_user/{user_id}')
-async def get_by_user(user_id: str):
-    return None
+async def get_by_user(user_id: str, session: AsyncSession = Depends(get_async_session)):
+    result = await session.execute(select(Post).where(Post.user_id == int(user_id)).where(Post.is_public == True))
+    result = result.scalars().first()
+    if result is None:
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    return PostRead.model_validate(result)
