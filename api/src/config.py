@@ -3,11 +3,6 @@ import os
 
 load_dotenv()
 
-AUTH_DB_HOST = os.environ.get("AUTH_DB_HOST")
-AUTH_DB_PORT = os.environ.get("AUTH_DB_PORT")
-AUTH_DB_NAME = os.environ.get("AUTH_DB_NAME")
-AUTH_DB_USER = os.environ.get("AUTH_DB_USER")
-AUTH_DB_PASS = os.environ.get("AUTH_DB_PASS")
 
 AUTH_SECRET = os.environ.get("AUTH_SECRET")
 AUTH_PASS_SECRET = os.environ.get("AUTH_PASS_SECRET")

@@ -6,8 +6,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from config import BUCKET, USE_BLOB
 from posts.blob import Blob
-from posts.database import Post, get_async_session
-from posts.models import PostCreate, PostRead, PostPublicRead, PostDetailRead
+from api.src.posts.models import Post, get_async_session
+from api.src.posts.schemas import PostCreate, PostRead, PostPublicRead, PostDetailRead
 
 router_post = APIRouter(
     prefix='/posts',
@@ -71,6 +71,7 @@ async def update_post(hash_id: str, session: AsyncSession = Depends(get_async_se
     return None
 
 # Нужно добавить что удалить может только сам пользователь
+# TODO: добавить удаление
 @router_post.delete('/{hash_id}')
 async def delete_post(hash_id: str):
     return None

@@ -2,8 +2,10 @@ import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import fastapi_users
-from auth.database import User, create_db_and_tables
-from posts.database import Post, create_db_posts
+from auth.database import User, init_roles
+from database import init_db
+from posts.database import init_categories
+from database import get_async_session
 from auth.manager import get_user_manager
 from auth.shemas import UserCreate, UserRead
 from posts.posts import router_post
@@ -15,15 +17,22 @@ app.include_router(router_post)
 
 @app.on_event("startup")
 async def on_startup():
-    await create_db_and_tables()
-    await create_db_posts()
+    # Инициализация общей структуры БД
+    await init_db()
+    
+    # Инициализация данных
+    async for session in get_async_session():
+        # Инициализация ролей пользователей
+        await init_roles(session)
+        # Инициализация категорий для постов
+        await init_categories(session)
+        print("База данных успешно инициализирована")
 
 
 fastapi_users = fastapi_users.FastAPIUsers[User, int](
     get_user_manager,
     [auth_backend],
 )
-
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend),

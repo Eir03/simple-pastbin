@@ -5,14 +5,13 @@ from threading import Thread
 import time
 import os
 
-AUTH_DB_HOST = os.environ.get("AUTH_DB_HOST")
-
 # Подключение к Redis
-r = redis.Redis(os.environ.get("HOST_REDIS"), 
+r = redis.Redis(host=os.environ.get("HOST_REDIS"), 
                 port=os.environ.get("PORT_REDIS"), 
-                db=os.environ.get("DB_REDIS"))
+                db=os.environ.get("DB_REDIS"),
+                password=os.environ.get("REDIS_PASSWORD"))
 
-HASH_CACHE_KEY = os.environ.get("HASH_CACHE_KEY")  # Ключ для хранения хешей в кэше
+HASH_CACHE_KEY = os.environ.get("HASH_CACHE_KEY")  # Ключ для хранения хешей
 MAX_COUNT = int(os.environ.get("MAX_COUNT"))
 
 def generate_hash():
@@ -24,13 +23,14 @@ def populate_cache():
         if r.llen(HASH_CACHE_KEY) < MAX_COUNT:
             for _ in range(MAX_COUNT):
                 r.lpush(HASH_CACHE_KEY, generate_hash()) 
-        time.sleep(10)  # Спим 10 секунд перед следующей проверкой
+        time.sleep(10)  # 10 секунд перед следующей проверкой
 
-# Запуск фоновой задачи для наполнения кэша, потом будет через celery
+# Запуск фоновой задачи для наполнения кэша
+# TODO: сделать через redis
 Thread(target=populate_cache, daemon=True).start()
 
 
-# Endpoint для получения хеша
+# Функция для получения хеша
 async def get_hash():
     if r.llen(HASH_CACHE_KEY) == 0:  # Если кэш пуст
         return generate_hash()
