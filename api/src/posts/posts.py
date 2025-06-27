@@ -6,8 +6,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from config import BUCKET, USE_BLOB
 from posts.blob import Blob
-from api.src.posts.models import Post, get_async_session
-from api.src.posts.schemas import PostCreate, PostRead, PostPublicRead, PostDetailRead
+from .models import Post
+from database import get_async_session
+from .schemas import PostCreate, PostRead, PostPublicRead, PostDetailRead
 
 router_post = APIRouter(
     prefix='/posts',

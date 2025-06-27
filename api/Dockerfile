@@ -6,8 +6,11 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
+
 COPY ./src ./src
-COPY ./src/.env.copy ./src/.env
+COPY ./utils/generate_keys.py /app/utils/generate_keys.py
+
+RUN python /app/utils/generate_keys.py
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
