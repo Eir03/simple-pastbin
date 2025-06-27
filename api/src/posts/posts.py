@@ -1,79 +1,88 @@
 from datetime import datetime, timezone
+from hash_gen.hash_gen import get_hash
 from fastapi import APIRouter, Depends, HTTPException
-import httpx
+from typing import List
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from config import URL_BLOB, URL_HASH_GEN, BUCKET
-from posts.blob import upload_text_to_s3
-from posts.database import Post, get_async_session
-from posts.models import PostCreate, PostRead
+from config import BUCKET, USE_BLOB
+from posts.blob import Blob
+from .models import Post
+from database import get_async_session
+from .schemas import PostCreate, PostRead, PostPublicRead, PostDetailRead
 
 router_post = APIRouter(
     prefix='/posts',
     tags=['posts']
 )
 
-async def get_hash_from_service():
-    async with httpx.AsyncClient() as client:
-        response = await client.get(URL_HASH_GEN + "/get-hash")
-        if response.status_code != 200:
-            raise HTTPException(status_code=500, detail="Failed to generate hash")
-        return response.json().get("hash")
+blob = Blob()
 
-@router_post.get('')
-async def get_posts():
-    return ''
+@router_post.get('', response_model=List[PostPublicRead])
+async def get_posts(session: AsyncSession = Depends(get_async_session), skip: int = 0, limit: int = 10):
+    query = select(Post).where(Post.is_public == True).offset(skip).limit(limit)
+    result = await session.execute(query)
+    posts = result.scalars().all()
+    return [PostPublicRead.model_validate(post) for post in posts]
 
+@router_post.get('/{hash_id}', response_model=PostRead)
+async def get_post(hash_id: str, session: AsyncSession = Depends(get_async_session)):
+    result = await session.execute(select(Post).where(Post.hash == hash_id))
+    result = result.scalars().first()
+    if result is None:
+        raise HTTPException(status_code=404, detail="Not Found")
+    
+    if result.delete_after_reading:
+        await session.delete(result)
+        await session.commit()
+        
+        blob.delete_object_from_s3(BUCKET, result.hash)
+
+    return PostDetailRead.model_validate(result)
+    
 @router_post.post('', response_model=PostRead)
 async def create_post(post: PostCreate, session: AsyncSession = Depends(get_async_session)):
-    hash_value = await get_hash_from_service()
+    hash_value = await get_hash()
 
-    blob_storage_url = upload_text_to_s3(BUCKET, f'{hash_value}', post.content)
+    blob_storage_url = blob.upload_text(BUCKET, f'{hash_value}', post.content)
 
-    if blob_storage_url is None:
+    content_post = None if blob_storage_url else post.content
+
+    if USE_BLOB and blob_storage_url is None:
         raise HTTPException(status_code=500, detail="Failed to upload content to S3")
     
-    now = datetime.now(timezone.utc)
-
     new_post = Post(
         title=post.title,
         hash=hash_value,
-        blob_storage_url=blob_storage_url,
+        blob_storage_url=blob_storage_url if blob_storage_url else "None",
         category_id=post.category_id,
         is_public=post.is_public,
-        created_at=now,
+        created_at=datetime.now(timezone.utc),
         delete_after_reading=post.delete_after_reading,
         tags=post.tags,
-        expires_at=post.expires_at
+        expires_at=post.expires_at,
+        content=content_post
     )
     session.add(new_post)
     await session.commit()
     await session.refresh(new_post)
     return PostRead.model_validate(new_post)
 
-@router_post.get('/{hash_id}', response_model=PostRead)
-async def get_post(hash_id: str, session: AsyncSession = Depends(get_async_session)):
-    # Добавить удаление после прочтения
-    # Добавить приватность
-
-    result = await session.execute(select(Post).where(Post.hash == hash_id))
-    result = result.scalars().first()
-    if result is None:
-        raise HTTPException(status_code=404, detail="Not Found")
-    
-    return PostRead.model_validate(result)
-    
-
 @router_post.put('/{hash_id}')
 async def update_post(hash_id: str, session: AsyncSession = Depends(get_async_session)):
     return None
 
 # Нужно добавить что удалить может только сам пользователь
+# TODO: добавить удаление
 @router_post.delete('/{hash_id}')
 async def delete_post(hash_id: str):
     return None
 
 # Посты должны иметь публичный доступ
 @router_post.get('/get_by_user/{user_id}')
-async def get_by_user(user_id: str):
-    return None
+async def get_by_user(user_id: str, session: AsyncSession = Depends(get_async_session)):
+    result = await session.execute(select(Post).where(Post.user_id == int(user_id)).where(Post.is_public == True))
+    result = result.scalars().first()
+    if result is None:
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    return PostRead.model_validate(result)

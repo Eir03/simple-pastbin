@@ -1,0 +1,44 @@
+version: '3'
+services:
+  api:
+    build: ./api
+    ports:
+      - "8000:8000"
+    env_file: 
+      - ./api/src/.env
+    volumes:
+      - ./api/keys:/app/keys
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:13-alpine
+    env_file:
+      - ./api/src/.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    build:
+      context: ./api
+      dockerfile: redis.Dockerfile
+    env_file:
+      - ./api/src/.env
+    ports:
+      - "6379:6379"
+
+  frontend:
+    build: ./front
+    env_file:
+      - ./front/.env
+    ports:
+      - "3000:80"
+
+# volumes для сохранения данных
+volumes:
+  postgres_data:
+
+

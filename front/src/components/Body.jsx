@@ -3,6 +3,7 @@ import './Body.css'
 import TagInput from './TagInput'
 import {createPost} from '../Api';
 import TextArea from './TextArea';
+import Sidebar from './Sidebar';
 
 const Body = () => {  
 
@@ -84,9 +85,9 @@ const Body = () => {
       if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
         e.preventDefault();  // Предотвращаем отправку формы, если нажат Enter, кроме поля textarea
       }}}>
-      <div className="main">
+      <div className="main border-solid border-[1px] border-[#ebebeb]">
           <div className="content">
-              <h3 className="newpost">Новый пост</h3>
+              <h3 className="newpost">Новая заметка</h3>
               <TextArea formData={formData} handleInputChange={handleInputChange}/>
               <div className="settings">
                   <div className="settings_title">
@@ -102,18 +103,7 @@ const Body = () => {
                   </div>
               </div>
           </div>
-          <div className="sidebar">
-              <div className="sidebar_title">
-                  <h3>Популярные посты</h3>
-              </div>
-              <div className="sidebar_menu">
-                  <h4>Популярный пост</h4>
-                  <h4>Популярный пост</h4>
-                  <h4>Популярный пост</h4>
-                  <h4>Популярный пост</h4>
-                  <h4>Популярный пост</h4>
-              </div>
-          </div> 
+          <Sidebar/>
       </div>
     </form>
   )
@@ -124,7 +114,7 @@ const temporaryFieldConfig = [
     label: 'Категория',
     type: 'select',
     name: 'category_id',
-    options: ["Отутствует", "Автомобили", "Бизнес", "Дом и сад", "Еда и напитки", "Животные", "Игры", "Искусство", "История", "Книги", "Личное развитие", "Мода", "Музыка", "Наука", "Образование", "Психология", "Путешествия", "Развлечения", "Спорт", "Технологии", "Фильмы", "Финансы", "Фотография", "Политика", "Здоровье"],
+    options: ["Отсутствует", "Автомобили", "Бизнес", "Дом и сад", "Еда и напитки", "Животные", "Игры", "Искусство", "История", "Книги", "Личное развитие", "Мода", "Музыка", "Наука", "Образование", "Психология", "Путешествия", "Развлечения", "Спорт", "Технологии", "Фильмы", "Финансы", "Фотография", "Политика", "Здоровье"],
   },
   {
     label: 'Метки',

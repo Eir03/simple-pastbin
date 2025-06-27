@@ -1,21 +1,12 @@
 .main {
-  background-color: rgb(245, 222, 193);
+  /* background-color: rgb(245, 222, 193); */
+  background-color: rgb(247, 247, 247);
   margin: 0 10vh;
   display: grid;
   grid-template-columns: 3fr 1fr;
+  border-radius: 5px;
 }
-.sidebar {
-  border-left: 1px dotted grey;
-  padding-left: 10px;
-  margin-left: 20px;
-}
-.sidebar_title {
-  border-bottom: 1px dotted grey;
-}
-.sidebar_menu h4 {
-  padding-bottom: 10px;
-  border-bottom: 1px dotted grey;
-}
+
 .content textarea {
   overflow: hidden;
   overflow-wrap: break-word;
@@ -36,20 +27,25 @@
   -o-tab-size: 4;
   -webkit-tab-size: 4;
 }
+
 textarea:focus {
   outline: none;
 }
+
 .newpost {
   margin: 10px 0 0 10px;
 }
+
 .settings {
   padding: 10px;
   width: 450px;
 
 }
-.settings_body{
-    font-size: 14px;
+
+.settings_body {
+  font-size: 14px;
 }
+
 .form-group {
   margin-bottom: 15px;
   display: flex;
@@ -57,7 +53,7 @@ textarea:focus {
   align-items: center;
 }
 
-.form-group label{
+.form-group label {
   align-self: flex-start;
   margin-top: 8px;
 }
@@ -72,13 +68,19 @@ textarea:focus {
 }
 
 .noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Edge, Opera and Firefox */
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Old versions of Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+      supported by Chrome, Edge, Opera and Firefox */
 }
 
 .new-badge {
@@ -101,8 +103,13 @@ textarea:focus {
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
+  transition: all 0.2s;
 }
 
 .create-button:hover {
   background-color: #0056b3;
+}
+
+.settings_title h3 {
+  margin-top: 0;
 }

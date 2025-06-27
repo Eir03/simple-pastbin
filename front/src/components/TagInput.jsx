@@ -21,25 +21,27 @@ const TagInput = ({tags, onChange}) => {
     };
 
     return (
-      <div className="tag-input">
-        <input
-          type="text"
-          onKeyUp={event => (event.key === 'Enter' ? addTagData(event) : null)}
-        />
+    <div className="tag-input">
+      <input
+        type="text"
+        onKeyUp={(event) => (event.key === 'Enter' ? addTagData(event) : null)}
+      />
+      {tagData.length > 0 && (
         <ul className="tags">
           {tagData.map((tag, index) => (
             <li key={index} className="tag">
               <span className="tag-title">{tag}</span>
               <span
                 className="tag-close-icon"
-                onClick={() => removeTagData(index)}>
+                onClick={() => removeTagData(index)}
+              >
                 ×
               </span>
             </li>
           ))}
         </ul>
-        
-      </div>
+      )}
+    </div>
     )
 }
 
